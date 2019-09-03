@@ -1,0 +1,28 @@
+{
+    "name": "weiwei2012holy\/eolinker-doc",
+    "description": "eolinker api doc generate tool",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "yuwei",
+            "email": "463313681@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "illuminate/container": "~5.3.0|~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0",
+        "illuminate/database": "~5.4.0|~5.5.0|~5.6.0|~5.7.0|~5.8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Weiwei2012holy\\EolinkerDoc\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Weiwei2012holy\\EolinkerDoc\\ServiceProvider"
+            ]
+        }
+    }
+}
