@@ -46,7 +46,12 @@ public function home()
     return $data;
 }
 
+
+# 路由文件定义
+Route::get('test', 'HomeController@home')->name('测试应用.测试模块.测试doc-composer');
+
 ```
+![实际生成效果](http://wx-static.yidejia.com/15677730325b32fa3acddec83fa347798a885dfc6b)
 
 #### 参数说明
 
