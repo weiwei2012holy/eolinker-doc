@@ -63,7 +63,7 @@ class ApiDocParseTool
     }
 
     /**
-     * 解析挨批定义
+     * 解析api定义
      *
      * @param string $content
      * @param array  $outPut

@@ -7,7 +7,7 @@
 
 namespace Weiwei2012holy\EolinkerDoc\Models;
 
-use Weiwei2012holy\EolinkerDoc\Models\EoApi;
+use Weiwei2012holy\EolinkerDoc\Exceptions\EolinkerException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -16,6 +16,75 @@ error_reporting(E_ALL ^ E_NOTICE);
 
 class ApiDocGenerateTool
 {
+    protected $userID;
+
+    protected $project;
+
+    /**
+     * ApiDocGenerateTool constructor.
+     *
+     * @param string $account eolikner账户名称
+     * @param int    $project 项目id,看接口文档地址栏projectID参数
+     *
+     * @throws EolinkerException
+     */
+    public function __construct(string $account, int $project)
+    {
+        if (!$user = $this->getUser($account)) {
+            throw new EolinkerException('该账户不存在');
+        }
+        $this->checkoutAuth($user->getKey(), $project);
+        $this->userID = $user->getKey();
+        $this->project = $project;
+        return $this;
+    }
+
+
+    /**
+     * 校验当前用户是否可以操作该项目
+     *
+     * @param int $userID
+     * @param int $projectID
+     *
+     * @return bool
+     * @throws EolinkerException
+     */
+    protected function checkoutAuth(int $userID, int $projectID)
+    {
+        if (!in_array($projectID, $this->getUserProject($userID)->pluck('projectID')->toArray())) {
+            throw new EolinkerException('caution !!! 正在操作非法的项目!');
+        }
+        return true;
+    }
+
+    /**
+     * 获取用户可操作的项目,避免有人乱写
+     *
+     * @param int $userID
+     *
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
+    protected function getUserProject(int $userID)
+    {
+        return EoProject::query()
+            ->whereIn('projectID', EoConnProject::query()
+                ->where('userID', $userID)
+                ->pluck('projectID'))->get();
+    }
+
+
+    /**
+     * 获取用户信息
+     *
+     * @param string $account
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|EoUser|null
+     */
+    protected function getUser(string $account)
+    {
+        return EoUser::query()->where('userName', $account)->first();
+    }
+
     /**
      * 获取路由列表
      * $filters['name'] = (string)筛选路由名称
@@ -77,7 +146,7 @@ class ApiDocGenerateTool
      * @return string|string[]|null
      * @throws \ReflectionException
      */
-    public function parseDoc($action)
+    protected function parseDoc($action)
     {
         list($className, $fn) = explode('@', $action);
         $class = new \ReflectionClass($className);
@@ -95,15 +164,15 @@ class ApiDocGenerateTool
 
 
     /**
-     * @param array $api
-     * @param int   $projectId
+     * 生成文档
      *
-     * @throws Exception
-     * @throws \App\Exceptions\IllegalDataFieldException
-     * @throws \ReflectionException
+     * @param array $api
+     *
      * @return  bool
+     * @throws \ReflectionException
+     * @throws \Throwable
      */
-    public function createEoliknerDoc(array $api, int $projectId = 107)
+    public function createEoliknerDoc(array $api)
     {
         $eolikner = new ApiEoLinkerTool();
         $requestMethod = EoApi::enumApiRequestType(false);
@@ -132,8 +201,8 @@ class ApiDocGenerateTool
         $apiStatus = EoApi::getApiStatus($parseInfo['status'] ?: '');
         $apiInfo['apiName'] = $apiStatus['emoji'] . $apiName;
         //创建层级菜单
-        $group = $eolikner->createGroup($apiGroupInfo, $projectId);
-        $apiInfo['projectID'] = $projectId;
+        $group = $eolikner->createGroup($apiGroupInfo, $this->project);
+        $apiInfo['projectID'] = $this->project;
         $apiInfo['apiURI'] = $api['uri'];
         $apiInfo['apiRequestType'] = $requestMethod[$method];
         $apiInfo['groupID'] = $group->groupID;

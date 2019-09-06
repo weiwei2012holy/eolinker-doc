@@ -26,20 +26,19 @@ class CreateDoc extends Command
         $filters['method'] = $this->ask('请输入请求方式过滤,默认不匹配');
         $filters['name'] = $this->ask('请输入请求名称匹配,默认不匹配');
         $filters = array_filter($filters);
-        $wxaApiRepository = new ApiDocGenerateTool();
+        $wxaApiRepository = new ApiDocGenerateTool(config('eolinker.account'), config('eolinker.project_id'));
         $apiList = $wxaApiRepository->filterRoute($filters);
 
         $total = count($apiList);
         if ($total > 0) {
             if ($this->confirm('本次匹配到路由个数:' . $total . ',是否继续?')) {
                 foreach ($apiList as $api) {
-//                    try {
-                        //微信小程序-自动生成  写入到这个项目
-                        $wxaApiRepository->createEoliknerDoc($api, 107);
+                    try {
+                        $wxaApiRepository->createEoliknerDoc($api);
                         $this->info('[' . $api['method'] . '](' . $api['uri'] . ')==>done');
-//                    } catch (\Exception $e) {
-//                        $this->error('[' . $api['method'] . '](' . $api['uri'] . ')==>' . $e->getMessage());
-//                    }
+                    } catch (\Exception $e) {
+                        $this->error('[' . $api['method'] . '](' . $api['uri'] . ')==>' . $e->getMessage());
+                    }
                 }
                 $this->info('已处理完毕');
             } else {

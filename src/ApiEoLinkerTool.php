@@ -9,14 +9,11 @@ namespace Weiwei2012holy\EolinkerDoc\Models;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Weiwei2012holy\EolinkerDoc\Exceptions\EolinkerException;
 
 class ApiEoLinkerTool
 {
-    public function getUserProject($userId = 18)
-    {
-        $res = EoProject::query()->whereIn('projectID', EoConnProject::query()->where('userID', $userId)->pluck('projectID'))->get();
-        return $res->isEmpty() ? $res : $res->toArray();
-    }
+
 
     /**
      * 更新api基本信息
@@ -34,19 +31,6 @@ class ApiEoLinkerTool
         ], $data);
     }
 
-    /**
-     * @param $projectID
-     *
-     * @return bool
-     * @throws IllegalDataFieldException
-     */
-    public function checkoutAuth($projectID)
-    {
-        if (!in_array($projectID, array_column($this->getUserProject(), 'projectID'))) {
-            throw new \Exception('caution !!! 正在操作非法的项目!');
-        }
-        return true;
-    }
 
     /**
      * 创建分组

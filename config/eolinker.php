@@ -8,4 +8,9 @@
 return [
     //eolinker 数据库链接
     'connection' => env('EOLINKER_DB_CONN', 'eolinker'),
+    //文档生成者用户id
+    'account' => env('EOLINKER_DEFAULT_ACCOUNT'),
+    //文档生成到具体某个项目id
+    'project_id'=>env('EOLINKER_DEFAULT_PROJECT_ID')
+
 ];
