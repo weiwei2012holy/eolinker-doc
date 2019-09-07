@@ -51,7 +51,7 @@ class ApiDocParseTool
         foreach ($data as $item) {
             preg_match($keyReg, $item, $matchesKey);
             $temp = ['key' => $matchesKey[1], 'value' => trim($matchesKey[2])];
-            $fn = 'parse' . studly_case($temp['key']);
+            $fn = 'parse' . Str::studly($temp['key']);
             if (method_exists($this, $fn)) {
                 if (!$temp['value']) {
                     continue;
