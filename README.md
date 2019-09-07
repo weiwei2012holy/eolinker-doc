@@ -85,6 +85,25 @@ public function home()
 # 路由文件定义
 Route::get('test', 'HomeController@home')->name('测试应用.测试模块.测试doc-composer');
 
+
+# 模型自定义字段,支持数组
+public function getTableFullColumnsCustom(): array
+{
+    return [
+        'test'=>'test',
+        'test2'=>'test2',
+        'test_arr'=>[
+            'test_aaa'=>'test_aaa',
+            'test_bbb'=>'test_bbb',
+            'test_ccc'=>[
+                'test_c1'=>111,
+                'test_c2'=>222,
+            ]
+        ]
+    ];
+}
+
+
 ```
 ![实际生成效果](http://wx-static.yidejia.com/15677730325b32fa3acddec83fa347798a885dfc6b)
 

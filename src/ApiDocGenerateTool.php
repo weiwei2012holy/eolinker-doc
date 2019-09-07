@@ -7,6 +7,7 @@
 
 namespace Weiwei2012holy\EolinkerDoc\Models;
 
+use Illuminate\Support\Arr;
 use Weiwei2012holy\EolinkerDoc\Exceptions\EolinkerException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
@@ -225,7 +226,7 @@ class ApiDocGenerateTool
         if ($parseInfo['params']) {
             foreach ($parseInfo['params'] as $param) {
                 $requestParam['paramName'] = ($param['description'] ?: $param['field']) . ($param['allowed_values'] ? ',可选值:' . $param['allowed_values'] : '') . ',类型:' . $param['type'];
-                $requestParam['paramKey'] = str_replace('.', '>>', $param['field']);
+                $requestParam['paramKey'] = $this->formatKey($param['field']);
                 $requestParam['apiID'] = $apiRes->apiID;
                 $requestParam['paramValue'] = $param['default_value'];
                 $requestParam['paramType'] = $eolikner->parseParamType($param['type']);//参数类型
@@ -234,17 +235,38 @@ class ApiDocGenerateTool
                 $eolikner->createRequestParam($requestParam);
                 //如果绑定了model 批量插入
                 if ($param['model']) {
-                    //暂时不支持值类型
-                    $requestParam['paramType'] = 0;
+
                     $fKey = $requestParam['paramKey'];
                     $model = new $param['model'];
-                    $cols = $model->getTableFullColumns();
+
+                    $cols = Arr::dot($model->getTableFullColumns());
+                    $modelKeyOwner = [];
                     foreach ($cols as $field => $desc) {
+                        //暂时不支持值类型
+                        $requestParam['paramType'] = EoApiRequestParam::PARAM_TYPE_STRING[EoApiRequestParam::ENUM_VALUE];
                         //限定字段,只需要获取指定字段即可
                         if ($param['model_field'] && !in_array($field, $param['model_field'])) {
                             continue;
                         }
-                        $requestParam['paramKey'] = $fKey . '>>' . $field;
+                        $explode = explode('.', $field);
+                        $explodeTotal = count($explode);
+                        //处理数组
+                        if ($explodeTotal > 1) {
+                            $temp = [];
+                            for ($i = 0; $i < $explodeTotal - 1; $i++) {
+                                $temp[] = $explode[$i];
+                                $newKey = implode('.', $temp);
+                                if (!in_array($newKey, $modelKeyOwner)) {
+                                    $newKeyFull = $fKey . '.' . $newKey;
+                                    $modelKeyOwner[] = $newKeyFull;
+                                    $requestParam['paramKey'] = $this->formatKey($newKeyFull);
+                                    $requestParam['paramName'] = '';
+                                    $requestParam['paramType'] = EoApiRequestParam::PARAM_TYPE_OBJ[EoApiRequestParam::ENUM_VALUE];
+                                    $eolikner->createRequestParam($requestParam);
+                                }
+                            }
+                        }
+                        $requestParam['paramKey'] = $this->formatKey($fKey . '.' . $field);
                         $requestParam['paramName'] = $desc;
                         $eolikner->createRequestParam($requestParam);
                     }
@@ -254,7 +276,7 @@ class ApiDocGenerateTool
         //处理返回值
         if ($parseInfo['success']) {
             foreach ($parseInfo['success'] as $param) {
-                $resultParam['paramKey'] = str_replace('.', '>>', $param['field']);
+                $resultParam['paramKey'] = $this->formatKey($param['field']);
                 $resultParam['paramName'] = ($param['description'] ?: $param['field']) . ($param['allowed_values'] ? ',可选值:' . $param['allowed_values'] : '') . ',类型:' . $param['type'];
                 $resultParam['apiID'] = $apiRes->apiID;
                 $resultParam['paramNotNull'] = $param['optional'] ? 1 : 0;//参数类型
@@ -263,13 +285,31 @@ class ApiDocGenerateTool
                 if ($param['model']) {
                     $fKey = $resultParam['paramKey'];
                     $model = new $param['model'];
-                    $cols = $model->getTableFullColumns();
+                    $cols = Arr::dot($model->getTableFullColumns());
+                    $modelKeyOwner = [];
                     foreach ($cols as $field => $desc) {
                         //限定字段,只需要获取指定字段即可
                         if ($param['model_field'] && !in_array($field, $param['model_field'])) {
                             continue;
                         }
-                        $resultParam['paramKey'] = $fKey . '>>' . $field;
+                        $explode = explode('.', $field);
+                        $explodeTotal = count($explode);
+                        //处理数组
+                        if ($explodeTotal > 1) {
+                            $temp = [];
+                            for ($i = 0; $i < $explodeTotal - 1; $i++) {
+                                $temp[] = $explode[$i];
+                                $newKey = implode('.', $temp);
+                                if (!in_array($newKey, $modelKeyOwner)) {
+                                    $newKeyFull = $fKey . '.' . $newKey;
+                                    $modelKeyOwner[] = $newKeyFull;
+                                    $resultParam['paramKey'] = $this->formatKey($newKeyFull);
+                                    $resultParam['paramName'] = '';
+                                    $eolikner->createResultParam($resultParam);
+                                }
+                            }
+                        }
+                        $resultParam['paramKey'] = $this->formatKey($fKey . '.' . $field);
                         $resultParam['paramName'] = $desc;
                         $eolikner->createResultParam($resultParam);
                     }
@@ -279,6 +319,18 @@ class ApiDocGenerateTool
         //生成缓存
         $eolikner->createCache($apiRes->apiID);
         return true;
+    }
+
+    /**
+     * 将.语法转换成eolikner对象语法>>
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    protected function formatKey(string $key)
+    {
+        return str_replace('.', '>>', $key);
     }
 
 }
