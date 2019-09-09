@@ -26,7 +26,7 @@ class CreateDoc extends Command
         $filters['method'] = $this->ask('请输入请求方式过滤,默认不匹配');
         $filters['name'] = $this->ask('请输入请求名称匹配,默认不匹配');
         $filters = array_filter($filters);
-        $wxaApiRepository = new ApiDocGenerateTool(config('eolinker.account'), config('eolinker.project_id'));
+        $wxaApiRepository = (new ApiDocGenerateTool())->init(config('eolinker.account'), config('eolinker.project_id'));
         $apiList = $wxaApiRepository->filterRoute($filters);
 
         $total = count($apiList);

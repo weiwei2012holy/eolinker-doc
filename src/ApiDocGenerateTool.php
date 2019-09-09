@@ -21,15 +21,17 @@ class ApiDocGenerateTool
 
     protected $project;
 
+
     /**
      * ApiDocGenerateTool constructor.
      *
      * @param string $account eolikner账户名称
      * @param int    $project 项目id,看接口文档地址栏projectID参数
      *
+     * @return ApiDocGenerateTool
      * @throws EolinkerException
      */
-    public function __construct(string $account, int $project)
+    public function init(string $account, int $project)
     {
         if (!$user = $this->getUser($account)) {
             throw new EolinkerException('该账户不存在');
