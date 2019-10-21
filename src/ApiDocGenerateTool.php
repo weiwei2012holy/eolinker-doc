@@ -113,14 +113,14 @@ class ApiDocGenerateTool
                 'uri' => $route->uri(),
                 'name' => $route->getName(),
                 'action' => ltrim($route->getActionName(), '\\'),
-                'middleware' => $this->getMiddleware($route),
+//                'middleware' => $this->getMiddleware($route),
             ];
             if (
                 isset($filters['name']) && !Str::contains($route['name'], $filters['name']) ||
                 isset($filters['path']) && !Str::contains($route['uri'], $filters['path']) ||
                 isset($filters['uri']) && !Str::contains($route['uri'], $filters['uri']) ||
                 isset($filters['action']) && !Str::contains($route['action'], $filters['action']) ||
-                isset($filters['middleware']) && !Str::contains($route['middleware'], $filters['middleware']) ||
+//                isset($filters['middleware']) && !Str::contains($route['middleware'], $filters['middleware']) ||
                 isset($filters['method']) && !Str::contains($route['method'], strtoupper($filters['method']))
             ) {
                 continue;
