@@ -8,6 +8,7 @@
 namespace Weiwei2012holy\EolinkerDoc;
 
 
+use Weiwei2012holy\EolinkerDoc\Commands\CreateCode;
 use Weiwei2012holy\EolinkerDoc\Commands\CreateDoc;
 use Weiwei2012holy\EolinkerDoc\Models\ApiDocGenerateTool;
 
@@ -22,6 +23,7 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 CreateDoc::class,
+                CreateCode::class,
             ]);
         }
     }
