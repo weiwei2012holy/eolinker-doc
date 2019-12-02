@@ -147,4 +147,34 @@ class ApiEoLinkerTool
         }
         return $typeValue;
     }
+
+    /**
+     * 创建状态码分组
+     *
+     * @param string $group
+     * @param        $projectID
+     *
+     * @return mixed
+     */
+    public function createProjectStatusCodeGroup(string $group, int $projectID)
+    {
+        return EoProjectStatusCodeGroup::query()->firstOrCreate(['projectID' => $projectID, 'groupName' => $group], ['parentGroupID' => 0, 'isChild' => 0]);
+    }
+
+
+    /**
+     * 创建状态码
+     *
+     * @param int    $code            状态码
+     * @param string $codeDescription 状态码描述
+     * @param int    $groupID         分组id
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model
+     */
+    public function createProjectStatusCode(int $code, string $codeDescription, int $groupID)
+    {
+        return EoProjectStatusCode::query()->updateOrCreate(['code' => $code, 'groupID' => $groupID], ['codeDescription' => $codeDescription]);
+    }
+
+
 }

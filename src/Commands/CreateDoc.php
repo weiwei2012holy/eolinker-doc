@@ -18,7 +18,6 @@ class CreateDoc extends Command
 
     public function handle()
     {
-
         if (!$filters['action'] = $this->ask('Action过滤,默认%App\Http\Controllers%')) {
             $filters['action'] = 'App\Http\Controllers';
         }
