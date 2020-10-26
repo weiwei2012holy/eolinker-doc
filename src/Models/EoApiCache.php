@@ -8,8 +8,8 @@ class EoApiCache extends Model
 {
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->connection = config('eolinker.connection');
+        parent::__construct($attributes);
     }
 
     protected $table = 'eo_api_cache';

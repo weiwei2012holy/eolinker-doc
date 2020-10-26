@@ -14,8 +14,8 @@ class EoProjectStatusCodeGroup extends Model
 {
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->connection = config('eolinker.connection');
+        parent::__construct($attributes);
     }
     public $timestamps = false;
 
