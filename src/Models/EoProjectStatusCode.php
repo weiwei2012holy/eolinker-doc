@@ -23,5 +23,5 @@ class EoProjectStatusCode extends Model
 
     protected $primaryKey = 'codeID';
 
-    public $guarded = ['codeID'];
+    public $guarded = [];
 }

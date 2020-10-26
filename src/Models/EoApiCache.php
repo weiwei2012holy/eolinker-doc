@@ -17,5 +17,5 @@ class EoApiCache extends Model
     public $timestamps = false;
 
     protected $primaryKey = 'cacheID';
-    public $guarded = ['cacheID'];
+    public $guarded = [];
 }

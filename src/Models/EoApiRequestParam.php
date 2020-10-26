@@ -17,7 +17,7 @@ class EoApiRequestParam extends Model
     public $timestamps = false;
 
     protected $primaryKey = 'paramID';
-    public $guarded = ['paramID'];
+    public $guarded = [];
 
     const ENUM_NAME = 'name';
     const ENUM_VALUE = 'value';

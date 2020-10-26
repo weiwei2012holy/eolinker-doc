@@ -19,7 +19,7 @@ class EoApi extends Model
 
     protected $primaryKey = 'apiID';
 
-    public $guarded = ['apiID'];
+    public $guarded = [];
 
     const ENUM_NAME = 'name';
     const ENUM_VALUE = 'value';

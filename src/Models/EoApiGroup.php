@@ -18,5 +18,5 @@ class EoApiGroup extends Model
 
     protected $primaryKey = 'groupID';
 
-    public $guarded = ['groupID'];
+    public $guarded = [];
 }
