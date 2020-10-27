@@ -211,8 +211,27 @@ class ApiDocGenerateTool
         $apiInfo['groupID'] = $group->groupID;
         $apiInfo['apiStatus'] = $apiStatus[EoApi::ENUM_VALUE];
         $apiInfo['apiProtocol'] = 1;//请求协议 0=http,1=https
-        $apiInfo['apiFailureMock'] = '';
-        $apiInfo['apiSuccessMock'] = '';
+
+        if ($parseInfo['api_success_example']['content']) {
+            if ($parseInfo['api_success_example']['type'] == 'json') {
+                $apiInfo['apiSuccessMock'] = $parseInfo['api_success_example']['content_json'];
+                $apiInfo['apiSuccessMockType'] = 1;
+            } else {
+                $apiInfo['apiSuccessMock'] = $parseInfo['api_success_example']['content'];
+                $apiInfo['apiSuccessMockType'] = 0;
+            }
+        }
+
+        if ($parseInfo['api_error_example']['content']) {
+            if ($parseInfo['api_error_example']['type'] == 'json') {
+                $apiInfo['apiErrorMock'] = $parseInfo['api_error_example']['content_json'];
+                $apiInfo['apiErrorMockType'] = 1;
+            } else {
+                $apiInfo['apiErrorMock'] = $parseInfo['api_error_example']['content'];
+                $apiInfo['apiErrorMockType'] = 0;
+            }
+        }
+
         $apiInfo['apiNote'] = "&lt;blockquote&gt;&lt;p&gt;最后更新时间:" . Carbon::now()->toDateTimeString() . "&lt;/p&gt;&lt;/blockquote&gt;&lt;p&gt;" . $parseInfo['api_description'];//详细说明 文本
         $apiInfo['apiNoteRaw'] = '&gt; 最后更新时间:' . Carbon::now()->toDateTimeString() . PHP_EOL . PHP_EOL;
         $apiInfo['apiNoteRaw'] .= "#### 可用请求方式:" . PHP_EOL;

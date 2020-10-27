@@ -177,6 +177,15 @@ class ApiDocParseTool
 
     /**
      * @param string $content
+     * @param        $outPut
+     */
+    public function parseApiErrorExample(string $content, &$outPut)
+    {
+        $outPut['api_error_example'] = $this->parseExample($content);
+    }
+
+    /**
+     * @param string $content
      *
      * @return array
      */
