@@ -5,7 +5,7 @@
  * Date: 2019-06-10,22:54
  */
 
-namespace Weiwei2012holy\EolinkerDoc\Models;
+namespace Weiwei2012holy\EolinkerDoc;
 
 
 use Illuminate\Support\Str;

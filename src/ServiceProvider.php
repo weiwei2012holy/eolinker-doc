@@ -10,7 +10,7 @@ namespace Weiwei2012holy\EolinkerDoc;
 
 use Weiwei2012holy\EolinkerDoc\Commands\CreateCode;
 use Weiwei2012holy\EolinkerDoc\Commands\CreateDoc;
-use Weiwei2012holy\EolinkerDoc\Models\ApiDocGenerateTool;
+use Weiwei2012holy\EolinkerDoc\ApiDocGenerateTool;
 
 class ServiceProvider extends \Illuminate\Support\ServiceProvider
 {

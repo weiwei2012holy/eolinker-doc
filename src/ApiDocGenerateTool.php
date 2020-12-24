@@ -5,7 +5,7 @@
  * Date: 2019-06-10,22:56
  */
 
-namespace Weiwei2012holy\EolinkerDoc\Models;
+namespace Weiwei2012holy\EolinkerDoc;
 
 use Illuminate\Support\Arr;
 use Weiwei2012holy\EolinkerDoc\Exceptions\EolinkerException;

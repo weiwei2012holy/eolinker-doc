@@ -8,7 +8,7 @@
 namespace Weiwei2012holy\EolinkerDoc\Commands;
 
 use Illuminate\Console\Command;
-use Weiwei2012holy\EolinkerDoc\Models\ApiDocGenerateTool;
+use Weiwei2012holy\EolinkerDoc\ApiDocGenerateTool;
 
 class CreateDoc extends Command
 {
