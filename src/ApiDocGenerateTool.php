@@ -13,6 +13,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Weiwei2012holy\EolinkerDoc\Models\EoApi;
+use Weiwei2012holy\EolinkerDoc\Models\EoApiRequestParam;
+use Weiwei2012holy\EolinkerDoc\Models\EoConnProject;
+use Weiwei2012holy\EolinkerDoc\Models\EoProject;
+use Weiwei2012holy\EolinkerDoc\Models\EoUser;
 
 error_reporting(E_ALL ^ E_NOTICE);
 
@@ -388,12 +393,13 @@ class ApiDocGenerateTool
      */
     protected function formatEnum(string $className, string $paramName)
     {
-        $model = new $className;
-        $values = $model->options();
-        $paramName .= ',可选值:';
+        $values = $className::options();
+        $paramName .= '(可选值:';
         foreach ($values as $v => $d) {
             $paramName .= $v . '=' . $d . ',';
         }
+        $paramName = substr($paramName, 0, -1);
+        $paramName .= ')';
         return $paramName;
     }
 
