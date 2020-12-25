@@ -12,6 +12,7 @@ use Weiwei2012holy\EolinkerDoc\Exceptions\EolinkerException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 error_reporting(E_ALL ^ E_NOTICE);
 
@@ -253,45 +254,62 @@ class ApiDocGenerateTool
                 $requestParam['paramType'] = $eolikner->parseParamType($param['type']);//参数类型
                 $requestParam['paramLimit'] = $param['size'] ? 'size:' . $param['size'] : '';
                 $requestParam['paramNotNull'] = $param['optional'] ? 1 : 0;//参数类型
-                $eolikner->createRequestParam($requestParam);
-                //如果绑定了model 批量插入
                 if ($param['model']) {
-
-                    $fKey = $requestParam['paramKey'];
-                    $model = new $param['model'];
-
-                    $cols = Arr::dot($model->getTableFullColumns());
-                    $modelKeyOwner = [];
-                    foreach ($cols as $field => $desc) {
-                        //暂时不支持值类型
-                        $requestParam['paramType'] = EoApiRequestParam::PARAM_TYPE_STRING[EoApiRequestParam::ENUM_VALUE];
-                        //限定字段,只需要获取指定字段即可
-                        if ($param['model_field'] && !in_array($field, $param['model_field'])) {
-                            continue;
-                        }
-                        $explode = explode('.', $field);
-                        $explodeTotal = count($explode);
-                        //处理数组
-                        if ($explodeTotal > 1) {
-                            $temp = [];
-                            for ($i = 0; $i < $explodeTotal - 1; $i++) {
-                                $temp[] = $explode[$i];
-                                $newKey = implode('.', $temp);
-                                if (!in_array($newKey, $modelKeyOwner)) {
-                                    $newKeyFull = $fKey . '.' . $newKey;
-                                    $modelKeyOwner[] = $newKeyFull;
-                                    $requestParam['paramKey'] = $this->formatKey($newKeyFull);
-                                    $requestParam['paramName'] = '';
-                                    $requestParam['paramType'] = EoApiRequestParam::PARAM_TYPE_OBJ[EoApiRequestParam::ENUM_VALUE];
-                                    $eolikner->createRequestParam($requestParam);
+                    $pClass = get_parent_class($param['model']);
+                    switch ($pClass) {
+                        case 'Wxa\Fast\Enums\Enum';
+                            $requestParam['paramName'] = $param['description'] ?: $param['field'];
+                            $requestParam['paramName'] = $this->formatEnum($param['model'], $requestParam['paramName']);
+                            break;
+                        case Model::class;
+                            $fKey = $requestParam['paramKey'];
+                            $model = new $param['model'];
+                            $cols = Arr::dot($model->getTableFullColumns());
+                            $modelKeyOwner = [];
+                            $modelParam = [
+                                'apiID' => $requestParam['apiID'],
+                                'paramLimit' => $requestParam['paramLimit'],
+                                'paramNotNull' => $requestParam['paramNotNull'],
+                                'paramType' => EoApiRequestParam::PARAM_TYPE_STRING[EoApiRequestParam::ENUM_VALUE],
+                                'paramValue' => $requestParam['paramValue']
+                            ];
+                            foreach ($cols as $field => $desc) {
+                                //暂时不支持值类型
+                                $requestParam['paramType'] = EoApiRequestParam::PARAM_TYPE_STRING[EoApiRequestParam::ENUM_VALUE];
+                                //限定字段,只需要获取指定字段即可
+                                if ($param['model_field'] && !in_array($field, $param['model_field'])) {
+                                    continue;
                                 }
+                                $explode = explode('.', $field);
+                                $explodeTotal = count($explode);
+                                //处理数组
+                                if ($explodeTotal > 1) {
+                                    $temp = [];
+                                    for ($i = 0; $i < $explodeTotal - 1; $i++) {
+                                        $temp[] = $explode[$i];
+                                        $newKey = implode('.', $temp);
+                                        if (!in_array($newKey, $modelKeyOwner)) {
+                                            $newKeyFull = $fKey . '.' . $newKey;
+                                            $modelKeyOwner[] = $newKeyFull;
+                                            $modelParam['paramKey'] = $this->formatKey($newKeyFull);
+                                            $modelParam['paramName'] = '';
+                                            $modelParam['paramType'] = EoApiRequestParam::PARAM_TYPE_OBJ[EoApiRequestParam::ENUM_VALUE];
+                                            $eolikner->createRequestParam($modelParam);
+                                        }
+                                    }
+                                }
+                                $modelParam['paramKey'] = $this->formatKey($fKey . '.' . $field);
+                                $modelParam['paramName'] = $desc;
+                                $eolikner->createRequestParam($modelParam);
                             }
-                        }
-                        $requestParam['paramKey'] = $this->formatKey($fKey . '.' . $field);
-                        $requestParam['paramName'] = $desc;
-                        $eolikner->createRequestParam($requestParam);
+                            break;
+                        default:
+                            throw new \Exception('un support model type:' . $pClass);
+
                     }
                 }
+
+                $eolikner->createRequestParam($requestParam);
             }
         }
         //处理返回值
@@ -301,45 +319,82 @@ class ApiDocGenerateTool
                 $resultParam['paramName'] = ($param['description'] ?: $param['field']) . ($param['allowed_values'] ? ',可选值:' . $param['allowed_values'] : '') . ',类型:' . $param['type'];
                 $resultParam['apiID'] = $apiRes->apiID;
                 $resultParam['paramNotNull'] = $param['optional'] ? 1 : 0;//参数类型
-                $eolikner->createResultParam($resultParam);
                 //如果绑定了model 批量插入
+
                 if ($param['model']) {
-                    $fKey = $resultParam['paramKey'];
-                    $model = new $param['model'];
-                    $cols = Arr::dot($model->getTableFullColumns());
-                    $modelKeyOwner = [];
-                    foreach ($cols as $field => $desc) {
-                        //限定字段,只需要获取指定字段即可
-                        if ($param['model_field'] && !in_array($field, $param['model_field'])) {
-                            continue;
-                        }
-                        $explode = explode('.', $field);
-                        $explodeTotal = count($explode);
-                        //处理数组
-                        if ($explodeTotal > 1) {
-                            $temp = [];
-                            for ($i = 0; $i < $explodeTotal - 1; $i++) {
-                                $temp[] = $explode[$i];
-                                $newKey = implode('.', $temp);
-                                if (!in_array($newKey, $modelKeyOwner)) {
-                                    $newKeyFull = $fKey . '.' . $newKey;
-                                    $modelKeyOwner[] = $newKeyFull;
-                                    $resultParam['paramKey'] = $this->formatKey($newKeyFull);
-                                    $resultParam['paramName'] = '';
-                                    $eolikner->createResultParam($resultParam);
+                    $pClass = get_parent_class($param['model']);
+                    switch ($pClass) {
+                        case 'Wxa\Fast\Enums\Enum';
+                            $resultParam['paramName'] = $param['description'] ?: $param['field'];
+                            $resultParam['paramName'] = $this->formatEnum($param['model'], $resultParam['paramName']);
+                            break;
+                        case Model::class;
+                            $fKey = $resultParam['paramKey'];
+                            $model = new $param['model'];
+                            $cols = Arr::dot($model->getTableFullColumns());
+                            $modelKeyOwner = [];
+                            $resultModelParam = [
+                                'apiID' => $resultParam['apiID'],
+                                'paramNotNull' => $resultParam['paramNotNull']
+                            ];
+                            foreach ($cols as $field => $desc) {
+                                //限定字段,只需要获取指定字段即可
+                                if ($param['model_field'] && !in_array($field, $param['model_field'])) {
+                                    continue;
                                 }
+                                $explode = explode('.', $field);
+                                $explodeTotal = count($explode);
+                                //处理数组
+                                if ($explodeTotal > 1) {
+                                    $temp = [];
+                                    for ($i = 0; $i < $explodeTotal - 1; $i++) {
+                                        $temp[] = $explode[$i];
+                                        $newKey = implode('.', $temp);
+                                        if (!in_array($newKey, $modelKeyOwner)) {
+                                            $newKeyFull = $fKey . '.' . $newKey;
+                                            $modelKeyOwner[] = $newKeyFull;
+                                            $resultModelParam['paramKey'] = $this->formatKey($newKeyFull);
+                                            $resultModelParam['paramName'] = '';
+                                            $eolikner->createResultParam($resultModelParam);
+                                        }
+                                    }
+                                }
+                                $resultModelParam['paramKey'] = $this->formatKey($fKey . '.' . $field);
+                                $resultModelParam['paramName'] = $desc;
+                                $eolikner->createResultParam($resultModelParam);
                             }
-                        }
-                        $resultParam['paramKey'] = $this->formatKey($fKey . '.' . $field);
-                        $resultParam['paramName'] = $desc;
-                        $eolikner->createResultParam($resultParam);
+                            break;
+                        default:
+                            throw new \Exception('un support model type:' . $pClass);
+
+
                     }
                 }
+                $eolikner->createResultParam($resultParam);
             }
         }
         //生成缓存
         $eolikner->createCache($apiRes->apiID);
         return true;
+    }
+
+    /**
+     * 格式化输出枚举
+     *
+     * @param string $className
+     * @param string $paramName
+     *
+     * @return string
+     */
+    protected function formatEnum(string $className, string $paramName)
+    {
+        $model = new $className;
+        $values = $model->options();
+        $paramName .= ',可选值:';
+        foreach ($values as $v => $d) {
+            $paramName .= $v . '=' . $d . ',';
+        }
+        return $paramName;
     }
 
     /**
@@ -363,7 +418,7 @@ class ApiDocGenerateTool
      *
      * @return bool
      */
-    public function createCode( $groupName, array $codeData)
+    public function createCode($groupName, array $codeData)
     {
         $tool = new ApiEoLinkerTool();
         $codeGroup = $tool->createProjectStatusCodeGroup($groupName, $this->project);
