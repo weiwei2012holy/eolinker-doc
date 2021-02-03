@@ -266,7 +266,8 @@ class ApiDocGenerateTool
                             $requestParam['paramName'] = $param['description'] ?: $param['field'];
                             $requestParam['paramName'] = $this->formatEnum($param['model'], $requestParam['paramName']);
                             break;
-                        case Model::class;
+                        //                        case Model::class;
+                        case (new $pClass) instanceof Model;
                             $fKey = $requestParam['paramKey'];
                             $model = new $param['model'];
                             $cols = Arr::dot($model->getTableFullColumns());
@@ -333,7 +334,8 @@ class ApiDocGenerateTool
                             $resultParam['paramName'] = $param['description'] ?: $param['field'];
                             $resultParam['paramName'] = $this->formatEnum($param['model'], $resultParam['paramName']);
                             break;
-                        case Model::class;
+                        //                        case Model::class;
+                        case (new $pClass) instanceof Model;
                             $fKey = $resultParam['paramKey'];
                             $model = new $param['model'];
                             $cols = Arr::dot($model->getTableFullColumns());
