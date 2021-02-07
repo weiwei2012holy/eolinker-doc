@@ -43,7 +43,7 @@ trait ModelInfo
     public function getTableFullColumnsDatabase(): array
     {
         $res = [];
-        $data = $this->getConnection()->select("SHOW FULL COLUMNS FROM " . $this->getFullTableNameFromDbConnection());
+        $data = $this->getConnection()->select("SHOW FULL COLUMNS FROM `" . $this->getFullTableNameFromDbConnection() . "`");
         foreach ($data as $item) {
             $res[$item->Field] = ($item->Comment ?: $item->Field) . ':' . $item->Type ;
         }
