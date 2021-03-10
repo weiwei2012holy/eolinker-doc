@@ -195,7 +195,16 @@ class ApiDocGenerateTool
         $method = strtolower(explode('|', $api['method'])[0] ?: 'post');
 
         $parseInfo = $this->parseDoc($api['action']);
-        $apiGroupInfo = array_filter(explode('.', $api['name']));
+        //处理目录，只支持三级目录
+        $parseApiName = array_filter(explode('.', $api['name']));
+        $level = 4;
+        if (count($parseApiName) > $level) {
+            $apiGroupInfo = array_slice($parseApiName, 0, $level);
+            $apiGroupInfo[$level - 1] .= '.' . implode('.', array_slice($parseApiName, $level));
+        } else {
+            $apiGroupInfo = $parseApiName;
+        }
+
         if ($level >= count($apiGroupInfo)) {
             throw new \Exception('接口需要缺少name');
         }
