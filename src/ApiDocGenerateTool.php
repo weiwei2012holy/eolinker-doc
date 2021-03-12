@@ -344,7 +344,7 @@ class ApiDocGenerateTool
                             $resultParam['paramName'] = $this->formatEnum($param['model'], $resultParam['paramName']);
                             break;
                         //                        case Model::class;
-                        case (new $pClass) instanceof Model;
+                        case (new $param['model']) instanceof Model;
                             $fKey = $resultParam['paramKey'];
                             $model = new $param['model'];
                             $cols = Arr::dot($model->getTableFullColumns());
