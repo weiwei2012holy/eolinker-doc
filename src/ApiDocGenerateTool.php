@@ -19,7 +19,7 @@ use Weiwei2012holy\EolinkerDoc\Models\EoConnProject;
 use Weiwei2012holy\EolinkerDoc\Models\EoProject;
 use Weiwei2012holy\EolinkerDoc\Models\EoUser;
 
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR);
 
 class ApiDocGenerateTool
 {

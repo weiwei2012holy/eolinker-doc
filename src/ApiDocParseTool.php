@@ -10,7 +10,7 @@ namespace Weiwei2012holy\EolinkerDoc;
 
 use Illuminate\Support\Str;
 
-error_reporting(E_ALL ^ E_NOTICE);
+error_reporting(E_ERROR);
 class ApiDocParseTool
 {
     const API = '@api';
