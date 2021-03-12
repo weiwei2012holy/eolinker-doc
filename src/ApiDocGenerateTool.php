@@ -197,10 +197,10 @@ class ApiDocGenerateTool
         $parseInfo = $this->parseDoc($api['action']);
         //处理目录，只支持三级目录
         $parseApiName = array_filter(explode('.', $api['name']));
-        $level = 4;
-        if (count($parseApiName) > $level) {
-            $apiGroupInfo = array_slice($parseApiName, 0, $level);
-            $apiGroupInfo[$level - 1] .= '.' . implode('.', array_slice($parseApiName, $level));
+        $levelDir = 4;
+        if (count($parseApiName) > $levelDir) {
+            $apiGroupInfo = array_slice($parseApiName, 0, $levelDir);
+            $apiGroupInfo[$levelDir - 1] .= '.' . implode('.', array_slice($parseApiName, $levelDir));
         } else {
             $apiGroupInfo = $parseApiName;
         }
