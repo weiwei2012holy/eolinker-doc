@@ -21,9 +21,9 @@ class CreateDoc extends Command
         if (!$filters['action'] = $this->ask('Action过滤,默认%App\Http\Controllers%')) {
             $filters['action'] = 'App\Http\Controllers';
         }
-        $filters['path'] = $this->ask('请输入接口名称过滤条件,默认不匹配');
-        $filters['method'] = $this->ask('请输入请求方式过滤,默认不匹配');
-        $filters['name'] = $this->ask('请输入请求名称匹配,默认不匹配');
+        $filters['path'] = $this->ask('path 过滤条件,默认不匹配');
+        $filters['method'] = $this->ask('method 过滤,默认不匹配');
+        $filters['name'] = $this->ask('名称 过滤,默认不匹配');
         $filters = array_filter($filters);
         //清楚缓存 避免找不到路由
         $this->call('route:clear');
