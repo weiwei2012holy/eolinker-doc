@@ -190,7 +190,7 @@ class ApiDocGenerateTool
         $level = substr_count($api['name'], '.');
 
         if ($level < 1) {
-            throw new \Exception('接口需要缺少name,命名规则:应用.模块.功能');
+            throw new \Exception('接口缺少name,命名规则:应用.模块.功能.name');
         }
         $method = strtolower(explode('|', $api['method'])[0] ?: 'post');
 
@@ -205,9 +205,7 @@ class ApiDocGenerateTool
             $apiGroupInfo = $parseApiName;
         }
 
-        if ($level >= count($apiGroupInfo)) {
-            throw new \Exception('接口需要缺少name');
-        }
+
         //构造api
         $apiName = array_pop($apiGroupInfo);
         //        $apiName = $parseInfo['api_name'] ?: $apiName;
