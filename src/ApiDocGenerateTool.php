@@ -260,6 +260,9 @@ class ApiDocGenerateTool
         if ($parseInfo['params']) {
             foreach ($parseInfo['params'] as $param) {
                 $requestParam['paramName'] = ($param['description'] ?: $param['field']) . ($param['allowed_values'] ? ',可选值:' . $param['allowed_values'] : '') . ',类型:' . $param['type'];
+                if ($param['size']) {
+                    $requestParam['paramName'] .= ',长度:' . $param['size'];
+                }
                 $requestParam['paramKey'] = $this->formatKey($param['field']);
                 $requestParam['apiID'] = $apiRes->apiID;
                 $requestParam['paramValue'] = $param['default_value'];
